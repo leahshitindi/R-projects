@@ -1,0 +1,49 @@
+?coplot
+head(mtcars)
+
+coplot(mpg~disp|factor(cyl),data=mtcars,rows =2 ,number = 3,
+       show.given = FALSE,
+       panel=function(x,y,...){
+         panel.loess(x,y,...)
+       })
+       
+    
+
+
+
+
+plt1 <- xyplot(mpg~disp,data=mtcars)
+print(plt1)
+object.size(plt1)
+
+
+
+plt2 <- xyplot(mpg~disp|factor(cyl),data=mtcars,layout=c(2,2));plt2
+
+object.size(plt2)
+
+plt3 <- xyplot(mpg~disp|cyl,
+               data=mtcars,layout=c(2,2),
+               panel=function(x,y,...){
+                 panel.xyplot(x,y,...)
+                 panel.loess(x,y,...)
+               })
+
+
+object.size(plt3)
+
+library(ggplot2)
+plt4 <- ggplot(mtcars,aes(x=disp,y=mpg))+
+  geom_point()
+
+object.size(plt4)
+
+
+plt6 <- plt4+facet_wrap(~cyl,nrow=2,ncol=2 );plt6
+
+plt7 <- plt6+geom_smooth(se=FALSE);plt7
+
+
+
+-3.26355+c(-1,1)*qt(0.975,31)*1.45453
+sqrt(0.1397)

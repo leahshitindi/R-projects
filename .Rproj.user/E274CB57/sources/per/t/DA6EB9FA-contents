@@ -1,0 +1,227 @@
+
+# Question 1 load the dataset morgue 
+morgue<-read.csv("https://raw.githubusercontent.com/kplevoet/texts/main/poe/morgue_TAG.txt", sep = "")
+morgue
+head(morgue, n=20)
+ # Question 2 remove all puctuation
+
+morgue_lan<-morgue[!morgue$upos=="PUNCT",]
+
+head(morgue_lan, n=10)
+
+#Question 3 convert the column lemma to lower case
+
+morgue_lan<-within(morgue_lan, lemma_low<-tolower(morgue_lan$lemma))
+morgue_lan
+head(morgue_lan, n=10)
+
+# Question 4 frequency of lemma
+morgue_frq<-table(morgue_lan$lemma_low)
+morgue_frq
+head(morgue_frq, n=10)
+
+
+# question 5 order the frequency from large to small
+
+morgue_frq<-sort(morgue_frq, decreasing = TRUE)
+head(morgue_frq, n=10)
+
+
+# Question 6 compute the number of type and number of tokens 
+
+morgue_V<-length(morgue_frq)
+morgue_V
+morgue_N<-sum(morgue_frq)
+morgue_N
+
+# question 7: Creation of frequency distribution 
+
+V<-function(x,n){
+ if (any(n<0)) stop(" Please enter a positive value")
+  if (any(n>sum(x))) warning(" outsite the range")
+ sum(x==n)
+}
+
+V(morgue_frq, n=20)
+
+# question 8
+v2<-function(x, vec){
+ out_vec<-vector(length = length(vec)) 
+ for (i in 1: length(vec) ){
+   n<-vec[i]
+   out_vec[i]<-v(x,n)
+ }
+ out_vec 
+}
+
+v2(x=morgue_frq, vec =c(1, 15))
+
+
+
+
+# Question 9: Creation of frequency spectrum 
+morgue_spc<-table(morgue_frq)
+head(morgue_spc, n=10)
+tail(morgue_spc, n=10)
+  
+# Question 10 : Creating function to calculate TTR
+
+TTR_freq<- function(x){
+  V<-length(x)
+  N<-sum(x)
+  ttr<-V/N
+  return(ttr)
+}
+
+
+TTR_freq(morgue_frq)
+
+TTR_spec<-function(x){
+  V<-sum(x)
+  N<-
+  
+}
+# Question 11: Using S3 to generate function
+
+class(morgue_frq)<-"freq"
+class(morgue_spc)<-"spec"
+TTR<-function(x,...) UseMethod("TTR")
+TTR.freq<-function(x){
+  N<-sum(x)
+  V<-length(x)
+  V/N
+}
+TTR(morgue_frq)
+
+
+# Question 12
+# data morgue
+freq<-function(x,...) UseMethod("freq")
+freq.character<-function(x,...){
+fq<-sort(table(x), decreasing = TRUE)  
+return(fq)
+}
+  
+  
+  
+spec<-function(x,...) UseMethod("spec")
+spec.character<-function(x,...){
+sq<-sort(table(table(x)), decreasing = TRUE)
+return(sq)
+}
+
+freq.character(morgue_lan$lemma_low)
+spec.character(morgue_lan$lemma_low)
+
+
+#data roget and cleaning 
+roget<-read.csv("https://raw.githubusercontent.com/kplevoet/texts/main/poe/roget_TAG.txt", sep = "")
+head(roget, n=10)
+roget_lan<-roget[!roget$upos=="PUNCT",]
+roget_lan<-roget_lan[!roget_lan$lemma=="PUNCT",]
+roget_lan<-within(roget_lan, lemma_low<-tolower(roget_lan$lemma))
+head(roget_lan,n=10)
+
+
+
+roget_freq<-freq(roget_lan$lemma_low)
+head(roget_freq)
+roger_spec<-spec(morgue_lan$lemma_low)
+
+head(roger_spec)
+
+# data for purloined 
+purloined<-read.csv("https://raw.githubusercontent.com/kplevoet/texts/main/poe/purloined_TAG.txt", sep = "", encoding = "UTF-8")
+head(purloined, n=20)
+
+purloined_lan<-purloined[!purloined$upos=="PUNCT",]
+purloined_lan<-purloined[!purloined$token=="PUNCT",]
+purloined_lan<-purloined[!purloined$lemma=="PUNCT",]
+
+purloined_lan<-within(purloined_lan,lemma_low<-tolower(purloined_lan$lemma))
+purloined_lan
+
+
+purloined_freq<-freq(purloined_lan$lemma_low)
+purloined_freq
+
+#data for usher
+usher<-read.csv("https://raw.githubusercontent.com/kplevoet/texts/main/poe/usher_TAG.txt", sep = "")
+usher_lan<-usher[!usher$upos=="PUNCT",]
+usher_lan
+
+usher_lan<-within(usher_lan,lemma_low<-tolower(usher_lan$lemma))
+usher_lan
+
+
+usher_freq<-freq(usher_lan$lemma_low)
+usher_freq
+
+
+
+# Question 13
+
+
+rj<-rank(-morgue_frq)
+nj<-morgue_frq
+data1<-as.data.frame(cbind(nj,rj))    
+
+data1<-within(data1,c(log_nj<-log(nj),log_rj<-log(rj)))
+head(data1)
+
+
+install.packages("tidyverse")
+
+library(ggplot2)
+Myplot<-ggplot(data1,aes(x=log_rj,y=log_nj))+
+
+  geom_point(color="red")+
+  xlab("rj")+
+  ylab("nj")
+
+Myplot+scale_x_continuous(breaks=seq(10^0, 10^4))
+
+
+#Question 14 Visualization with worldcloud
+
+install.packages("wordcloud2")
+library(wordcloud2)
+
+
+#data clearance
+morgue_cloud<-morgue[morgue$upos=="NOUN" | morgue$upos=="PROPN",]
+roget_cloud<-roget[roget$upos=="NOUN" | roget$upos=="PROPN",]
+purloined_cloud<-purloined[purloined$upos=="NOUN" | purloined$upos=="PROPN",]
+usher_cloud<-usher[usher$upos=="NOUN" | usher$upos=="PROPN",]
+
+morgue_cloud$lemma_low<- tolower(morgue_cloud$lemma)
+roget_cloud$lemma_low<- tolower(roget_cloud$lemma)
+purloined_cloud$lemma_low<- tolower(purloined_cloud$lemma)
+usher_cloud$lemma_low<- tolower(usher_cloud$lemma)
+
+
+# visualization for morgue dataset
+morgue_cloud_frq<- (as.data.frame(table(morgue_cloud$lemma_low)))
+head(morgue_cloud_frq)
+wordcloud2(morgue_cloud_frq, color = "orange")
+
+# visualization for roget dataset
+roget_cloud_frq<- as.data.frame(table(roget_cloud$lemma_low))
+head(roget_cloud_frq)
+wordcloud2(roget_cloud_frq, color = "pink")
+
+# worldcloud visualization for data purlined dataset 
+purloined_cloud_frq<- as.data.frame(table(purloined_cloud$lemma_low))
+head(purloined_cloud_frq)
+wordcloud2(purloined_cloud_frq, color = "green")
+
+
+# worldcloud visualization for usher dataset
+usher_cloud_frq<- as.data.frame(table(usher_cloud$lemma_low))
+head(usher_cloud_frq)
+wordcloud2(usher_cloud_frq, color="purple")
+
+
+
+    
+    
